@@ -1,0 +1,70 @@
+name: Telegram File Stream Bot
+
+on:
+  schedule:
+    - cron: "0 */4 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: bot-session
+  cancel-in-progress: true
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Create .env with secrets
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          API_ID: ${{ secrets.API_ID }}
+          API_HASH: ${{ secrets.API_HASH }}
+          LOG_CHANNEL: ${{ secrets.LOG_CHANNEL }}
+          ALLOWED_USERS: ${{ secrets.ALLOWED_USERS }}
+          NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
+        run: |
+          cat > .env << EOF
+          BOT_TOKEN=${BOT_TOKEN}
+          API_ID=${API_ID}
+          API_HASH=${API_HASH}
+          LOG_CHANNEL=${LOG_CHANNEL}
+          ALLOWED_USERS=${ALLOWED_USERS}
+          PORT=8080
+          HASH_LENGTH=6
+          EOF
+
+      - name: Install & start ngrok tunnel
+        env:
+          NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
+        run: |
+          if [ -z "${NGROK_TOKEN}" ]; then
+            echo "No NGROK_TOKEN set — using localhost only"
+            exit 0
+          fi
+          curl -sL https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-linux-amd64.tgz -o ngrok.tgz
+          tar xzf ngrok.tgz
+          ./ngrok config add-authtoken "${NGROK_TOKEN}"
+          nohup ./ngrok http 8080 --log=stdout > ngrok.log 2>&1 &
+          for i in $(seq 1 10); do
+            url=$(curl -s localhost:4040/api/tunnels 2>/dev/null | python3 -c "import sys,json; t=json.load(sys.stdin).get('tunnels',[]); print(t[0]['public_url'] if t else '')" 2>/dev/null)
+            if [ -n "$url" ]; then
+              echo "HOST=${url}" >> .env
+              echo "ngrok_url=${url}"
+              break
+            fi
+            sleep 2
+          done
+
+      - name: Run bot
+        run: |
+          python -u main.py
