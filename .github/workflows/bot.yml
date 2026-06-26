@@ -54,16 +54,9 @@ jobs:
           curl -sL https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-linux-amd64.tgz -o ngrok.tgz
           tar xzf ngrok.tgz
           ./ngrok config add-authtoken "${NGROK_TOKEN}"
-          nohup ./ngrok http 8080 --log=stdout > ngrok.log 2>&1 &
-          for i in $(seq 1 10); do
-            url=$(curl -s localhost:4040/api/tunnels 2>/dev/null | python3 -c "import sys,json; t=json.load(sys.stdin).get('tunnels',[]); print(t[0]['public_url'] if t else '')" 2>/dev/null)
-            if [ -n "$url" ]; then
-              echo "HOST=${url}" >> .env
-              echo "ngrok_url=${url}"
-              break
-            fi
-            sleep 2
-          done
+          nohup ./ngrok http --url=pancreas-balmy-wrecker.ngrok-free.dev 8080 > ngrok.log 2>&1 &
+          sleep 5
+          echo "HOST=https://pancreas-balmy-wrecker.ngrok-free.dev" >> .env
 
       - name: Run bot
         run: |
