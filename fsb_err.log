@@ -1,0 +1,11 @@
+INFO:     Started server process [17116]
+INFO:     Waiting for application startup.
+2026-06-26 14:21:17,172 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8694662365:AAE7aWgqGOwlJKj2ZSHJLDijjSQBpkSxflI/getMe "HTTP/1.1 200 OK"
+2026-06-26 14:21:17,175 - apscheduler.scheduler - INFO - Scheduler started
+2026-06-26 14:21:17,176 - telegram.ext.Application - INFO - Application started
+2026-06-26 14:21:17,404 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8694662365:AAE7aWgqGOwlJKj2ZSHJLDijjSQBpkSxflI/deleteWebhook "HTTP/1.1 200 OK"
+2026-06-26 14:21:17,407 - __main__ - INFO - Bot started polling
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
+2026-06-26 14:21:28,106 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8694662365:AAE7aWgqGOwlJKj2ZSHJLDijjSQBpkSxflI/getUpdates "HTTP/1.1 200 OK"
+2026-06-26 14:21:38,321 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8694662365:AAE7aWgqGOwlJKj2ZSHJLDijjSQBpkSxflI/getUpdates "HTTP/1.1 200 OK"
